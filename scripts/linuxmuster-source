@@ -9,20 +9,24 @@ use Getopt::Long;
 use English;
 
 # Todo:
-# mit diesem script auch svn holen -> nicht mehr notwendig
+# see ????? clone/pull the repos
 #
+# add configuraton files (ssh keyname, source_dir)
 #
-# add keyname to git.list
-# fetch the appropriate key
+# configure git (colors name, email, ...) 
 #
+# include and install hubflow?
 #
-# type ist 2. Feld -> anpassen
-#  Problem: kaelteaufgabe ist in cvs/mytex
-#
-# optionen --cvs-only, ...
-# file auch als multi option, siehe install packages
-# cvs/ubuntu -> zeugs entfernen
-
+# add option --check 
+#    to verify if debian/README.linuxmuster is there
+#    check more things
+# add option --buildpackage name
+#    to build a package
+# add option --build-all-packages
+# add option --cron to pull daily
+# add option to go to github on the project's page 
+# (fork it on github and pull the fork???)
+# 
 my $home = $ENV{'HOME'};
 
 
