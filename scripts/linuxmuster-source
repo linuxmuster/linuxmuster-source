@@ -1,0 +1,295 @@
+#!/usr/bin/perl -w
+# install packages
+# install ubuntu packages from a list
+# Licence: General Public Licence (GPL Version 3) 
+# Maintainer: jeffbeck-at-web-de
+
+use strict;
+use Getopt::Long;
+use English;
+
+# Todo:
+# mit diesem script auch svn holen -> nicht mehr notwendig
+#
+#
+# add keyname to git.list
+# fetch the appropriate key
+#
+#
+# type ist 2. Feld -> anpassen
+#  Problem: kaelteaufgabe ist in cvs/mytex
+#
+# optionen --cvs-only, ...
+# file auch als multi option, siehe install packages
+# cvs/ubuntu -> zeugs entfernen
+
+my $home = $ENV{'HOME'};
+
+
+# config
+my $keyname="jeffbeck";
+my $source_dir="linuxmuster-source";
+my $source_dir_abs=$home."/".$source_dir;
+my $repo_lists="/usr/share/linuxmuster-source/repos/github";
+
+# options
+my $help=0;
+my $info=0;
+my $owners=0;
+my $pull=0;
+
+# Parsen der Optionen
+my $testopt=GetOptions(
+           "help|h" => \$help,
+           "info|i" => \$info,
+           "owners|organisations|o" => \$owners,
+           "pull" => \$pull,
+          );
+
+
+# Prüfen, ob Optionen erkannt wurden
+&check_options($testopt);
+
+
+if ($help==1){
+       print('
+Options
+
+  -h  / --help
+
+  -i  / --info
+    show, where to checkout scripts,
+    and what modules will be checked out
+
+  -o  / --owners / --organisations
+    show Organisations/Owners from whom repos will be fetched
+
+');
+   print "\n";
+       exit;
+}
+
+
+
+############################################################
+# start
+############################################################
+
+# --owners / --organisations
+if ($owners==1){
+    print "\nRepos will be checked out to: $source_dir_abs\n";
+    print "----------------------------------------------------------\n";
+    my @owners = &fetch_owners();
+    print "Owners/Organisations:\n";
+    foreach my $owner (@owners){
+        print "  * $owner\n";
+    }
+    my $count=$#owners+1;
+    print "----------------------------------------------------------\n";
+    print "Repos from $count owners/organisations will be cloned/updated\n\n";
+    exit;
+}
+
+
+
+
+# --info
+if ($info==1){
+    print "\nRepos will be checked out to: $source_dir_abs\n";
+    print "----------------------------------------------------------\n";
+    my $repos=0;
+    my @owners = &fetch_owners();
+    foreach my $owner (@owners){
+        print "Owner/Organisation: $owner\n";
+        my @repos = &fetch_repos($owner);
+        foreach my $repo (@repos){
+            print "  * $repo\n";
+            $repos++;
+        }
+    }
+    print "----------------------------------------------------------\n";
+    print "$repos Repos will be cloned/updated\n\n";
+    exit;
+}
+
+
+
+# --pull
+if ($pull==1){
+    my @owners = &fetch_owners();
+    foreach my $owner (@owners){
+        my @repos = &fetch_repos($owner);
+        foreach my $repo (@repos){
+            # do it
+	    print "##### PULLING REPO:  $repo\n";
+            print "     Todo ??????????\n";
+            print "##### DONE WITH REPO $repo\n";
+        }
+    }
+}
+
+############################################################
+# subs
+############################################################
+
+sub fetch_owners {
+    # fetch all owners/organsations
+    my @owners=();
+    opendir GITHUB, $repo_lists or die "Fehler: $! ($repo_lists)";
+    foreach my $owner (readdir GITHUB){
+        if ($owner eq "."){next};
+        if ($owner eq ".."){next};
+        push @owners, $owner;
+        #print "User/Organisation: ".$dir."\n";
+    }
+    @owners = sort @owners;
+    return @owners;
+}
+
+
+sub fetch_repos {
+    # fetch all repos of an owner:   filename(ohne.list)::repo
+    my ($owner) = @_;
+    my @repos=();
+    my $owner_dir=$repo_lists."/".$owner;
+    opendir OWNER, $owner_dir or die "Fehler: $! ($owner_dir)";
+    foreach my $file (readdir OWNER){
+        if ($file eq "."){next};
+        if ($file eq ".."){next};
+        my $file_abs=$owner_dir."/".$file;
+        # open file and read the content
+        open (LIST, $file_abs) || die "Fehler: $! ($file_abs)";
+        my $range=$file;
+        $range=~s/.list//g;
+        while(<LIST>){
+            chomp();
+            my $range_repo=$range."::".$_;
+            push @repos, $range_repo;
+        }
+    }
+    return @repos;
+}
+
+
+
+sub  check_options{
+   my ($parse_ergebnis) = @_;
+   if (not $parse_ergebnis==1){
+      my @list = split(/\//,$0);
+      my $scriptname = pop @list;
+      print "\nYou have made a mistake, when specifying options.\n"; 
+      print "See error message above. \n\n";
+      print "... $scriptname is terminating.\n\n";
+      exit;
+   } else {
+         #print "   * All options  were recognized.\n";
+   }
+}
+
+
+
+sub check_ssh_key {
+    my ($key) = @_;
+    print "Checking for ssh-key of $key:  ";
+    my $return = system("ssh-add -l | grep $key > /dev/null");
+    if ($return==0){
+        print "LOADED\n";
+    } else {
+        print "NOT LOADED\n";
+        system("ssh-add ~/.ssh/$keyname")
+    }
+}
+
+
+
+########################################
+# git
+########################################
+sub pull_git {
+    # my ($path,$module,$server) = @_;
+    # if ($type eq "gitolite"){
+    #     &check_ssh_key($keyname);
+    # }
+    # my $module_path=$path."/".$module;
+    # my $co_command="cd $path".";"." git clone $server";
+    # my $update_command="cd $module_path".";"." git pull";
+    # system("mkdir -p $path");
+    # if (-e $module_path){
+    #     print "UPDATE COMMAND:\n";
+    #     print "   $update_command\n";
+    #     system($update_command); 
+    # } else {
+    #     print "CHECKOUT COMMAND:\n";
+    #     print "   $co_command\n";
+    #     system($co_command); 
+    # }
+}
+
+sub check_git {
+    # my ($path,$module,$server,$type) = @_;
+    # if ($type eq "gitolite"){
+    #     &check_ssh_key($keyname);
+    # }
+    # my $module_path=$path."/".$module;
+    # my $check_push_command="cd $module_path".";"." git push --dry-run";
+    # my $check_add_command="cd $module_path".";"." git add . --dry-run";
+    # my $check_commit_command="cd $module_path".";".
+    #                          " git commit --dry-run --short";
+    # if (-e $module_path){
+    #     print "\n########## $module ##########\n";
+    #     #system($check_add_command); 
+    #     system($check_commit_command);
+    #     print "Push:  ";
+    #     system($check_push_command); 
+    # }
+}
+
+
+
+# DEPRECATED
+
+sub fetch_modules {
+
+    # my ($file,$option) = @_;
+    # my @modules=();
+    # open (MODULES, "<$file");
+    # while(<MODULES>){
+    #    s/^ //g; # Leerzeichen am Zeilenangfang entfernen
+    #    if (m/^\#/ or $_ eq "\n"){
+    #        next;
+    #    }
+    #    chomp(); 
+
+    #    # LIST only
+    #    if ($option eq "LIST"){
+    #        printf "%-18s-> %-25s \n",$module,$source_dir_abs;
+    #        push @modules, $module;
+    #        next;
+    #    }
+
+    #    # FETCH       
+    #    if ($check==0 and $size==0){
+    #    print"\n";
+    #    print "############################################################\n";
+    #    print "#  Line:\n";
+    #    print "#  $_\n";
+    #    print "#  Module:        $module\n";       
+    #    print "#  Path :         $source_dir_abs\n";
+    #    print "#  Server:        $server\n";       
+    #    print "############################################################\n";
+    #    }
+
+    #    if ($check==1){
+    #        &check_git($path,$module,$server);
+    #    } elsif ($size==1){ 
+    #        &show_size($path,$module,$server);
+    #    } else {
+    #        &pull_git($path,$module,$server);
+    #    }
+    #    push @modules, $_;
+    # }
+    # close (MODULES);
+    # @modules = sort @modules;
+    # return @modules;
+}
+
