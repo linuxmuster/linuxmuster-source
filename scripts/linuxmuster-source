@@ -9,7 +9,7 @@ use Getopt::Long;
 use English;
 
 # Todo:
-# see ????? clone/pull the repos
+# see ????? .ssh/config with keyname
 #
 # add configuraton files (ssh keyname, source_dir)
 #
@@ -120,16 +120,47 @@ if ($info==1){
 
 # --pull
 if ($pull==1){
+    my $repo_counter=0;
     my @owners = &fetch_owners();
+    # make sure that the ssh key is loaded
+    &check_ssh_key($keyname);
+    system("mkdir -p $source_dir_abs");
     foreach my $owner (@owners){
         my @repos = &fetch_repos($owner);
+
+        # make sure the following line exists in .ssh/config
+        # ????? call it linuxmuster-source ?????
+
+        #Host github
+        #   HostName github.com
+        #   User git
+        #   IdentityFile ~/.ssh/jeffbeck
+
+        print "\n";
         foreach my $repo (@repos){
+            my ($range,$repo_name)=split(/::/,$repo);
             # do it
-	    print "##### PULLING REPO:  $repo\n";
-            print "     Todo ??????????\n";
-            print "##### DONE WITH REPO $repo\n";
+            $repo_counter++;
+	    print "${repo_counter}) PULLING/CLONING $repo\n";
+	    print "   owner/organisation: $owner\n";
+            my $clone_command="cd $source_dir_abs; ".
+                              "git clone github:${owner}/${repo_name}.git";
+            my $pull_command="cd ${source_dir_abs}/${repo_name}; ".
+                             "git pull";
+            #print "$clone_command\n";
+            #print "$pull_command\n";
+            if (-d "${source_dir_abs}/${repo_name}"){
+                print "   Pulling $repo_name ...\n";
+                system($pull_command);
+            } else {
+                print "   Cloning $repo_name ...\n";
+                system($clone_command);
+            }
+            print "----- DONE -------------------------------------------------\n\n";
         }
     }
+    #print "------------------------------------------------------------\n";
+    print "Cloned/Pulled $repo_counter repositories\n";
 }
 
 ############################################################
@@ -211,13 +242,13 @@ sub check_ssh_key {
 ########################################
 sub pull_git {
     # my ($path,$module,$server) = @_;
-    # if ($type eq "gitolite"){
-    #     &check_ssh_key($keyname);
-    # }
+       # if ($type eq "gitolite"){
+       #     &check_ssh_key($keyname);
+       # }
     # my $module_path=$path."/".$module;
     # my $co_command="cd $path".";"." git clone $server";
     # my $update_command="cd $module_path".";"." git pull";
-    # system("mkdir -p $path");
+       # system("mkdir -p $path");
     # if (-e $module_path){
     #     print "UPDATE COMMAND:\n";
     #     print "   $update_command\n";
