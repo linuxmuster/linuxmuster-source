@@ -48,3 +48,7 @@ deb:
 	@echo 'Do not forget to tag this version in git'
 	@echo ''
 
+
+clean:
+	### clean up
+	rm -rf debian/linuxmuster-source

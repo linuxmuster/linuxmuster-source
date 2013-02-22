@@ -1,0 +1,15 @@
+Source: linuxmuster-source
+Section: admin
+Priority: optional
+Maintainer: Ruediger Beck <jeffbeck@web.de>
+Build-Depends: 
+Standards-Version: 3.5.2
+
+
+Package: linuxmuster-source
+Architecture: all
+Suggests: 
+Pre-Depends: 
+Depends: 
+Description: managing linuxmuster.net sourcecode on github
+ lets you clone/pull the source and verify/test it
