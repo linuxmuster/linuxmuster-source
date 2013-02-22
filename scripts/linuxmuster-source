@@ -9,7 +9,7 @@ use Getopt::Long;
 use English;
 
 # Todo:
-# see ????? .ssh/config with keyname
+# see ????? .ssh/config with ssh_keyname
 #
 # add configuraton files (ssh keyname, source_dir)
 #
@@ -28,13 +28,35 @@ use English;
 # (fork it on github and pull the fork???)
 # 
 my $home = $ENV{'HOME'};
+my $conf_dir=$home."/.linuxmuster-source";
+my $conf_file=$conf_dir."/linuxmuster-source.conf";
+my $conf_example_file="/usr/share/linuxmuster-source/examples/example.linuxmuster-source.conf";
 
 
-# config
-my $keyname="jeffbeck";
+system("mkdir -p $conf_dir");
+
+if (not -e $conf_file){
+    system("cp $conf_example_file $conf_file");
+    print "\nExample Configutation file $conf_file created\n";
+    print "\nPlease edit it!\n";
+    exit;
+}
+
+# default config
+my $ssh_keyname="";
 my $source_dir="linuxmuster-source";
-my $source_dir_abs=$home."/".$source_dir;
+my $source_dir_abs = $home."/".$source_dir;
 my $repo_lists="/usr/share/linuxmuster-source/repos/github";
+
+{ package Conf ; do "$conf_file" 
+  || die "Fehler: $conf_file could not be processed (syntax error?)\n";
+  print "$conf_file processed succesfully\n"; 
+}
+
+
+# modify configuration
+$ssh_keyname=$Conf::ssh_keyname;
+print "Key: $Conf::ssh_keyname configured\n";
 
 # options
 my $help=0;
@@ -123,7 +145,7 @@ if ($pull==1){
     my $repo_counter=0;
     my @owners = &fetch_owners();
     # make sure that the ssh key is loaded
-    &check_ssh_key($keyname);
+    &check_ssh_key($ssh_keyname);
     system("mkdir -p $source_dir_abs");
     foreach my $owner (@owners){
         my @repos = &fetch_repos($owner);
@@ -224,14 +246,20 @@ sub  check_options{
 
 
 sub check_ssh_key {
-    my ($key) = @_;
-    print "Checking for ssh-key of $key:  ";
-    my $return = system("ssh-add -l | grep $key > /dev/null");
-    if ($return==0){
-        print "LOADED\n";
+    my ($ssh_keyname) = @_;
+    my $key_abs=$home."/.ssh/$ssh_keyname";
+    print "Checking for ssh-key $key_abs:\n";
+    if (-e $key_abs){
+        my $return = system("ssh-add -l | grep $ssh_keyname > /dev/null");
+        if ($return==0){
+            print "LOADED\n";
+        } else {
+            print "NOT LOADED\n";
+            system("ssh-add $key_abs")
+        }
     } else {
-        print "NOT LOADED\n";
-        system("ssh-add ~/.ssh/$keyname")
+        print "\nERROR: There is no key $key_abs\n\n";
+        exit;
     }
 }
 
@@ -243,7 +271,7 @@ sub check_ssh_key {
 sub pull_git {
     # my ($path,$module,$server) = @_;
        # if ($type eq "gitolite"){
-       #     &check_ssh_key($keyname);
+       #     &check_ssh_key($ssh_keyname);
        # }
     # my $module_path=$path."/".$module;
     # my $co_command="cd $path".";"." git clone $server";
@@ -263,7 +291,7 @@ sub pull_git {
 sub check_git {
     # my ($path,$module,$server,$type) = @_;
     # if ($type eq "gitolite"){
-    #     &check_ssh_key($keyname);
+    #     &check_ssh_key($ssh_keyname);
     # }
     # my $module_path=$path."/".$module;
     # my $check_push_command="cd $module_path".";"." git push --dry-run";
