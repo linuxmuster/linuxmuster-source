@@ -11,7 +11,7 @@ use English;
 # Todo:
 # see ????? .ssh/config with ssh_keyname
 #
-# add configuraton files (ssh keyname, source_dir)
+# add man page
 #
 # configure git (colors name, email, ...) 
 #
