@@ -38,6 +38,7 @@ my $ssh_config=$home."/.ssh/config";
 system("mkdir -p $conf_dir");
 
 # default config
+my $hubflow_version="1.4.2";
 my $ssh_keyname="";
 my $source_dir="linuxmuster-source";
 my $source_dir_abs = $home."/".$source_dir;
@@ -67,7 +68,6 @@ if (not -e $ssh_config){
     exit;
 } else {
     my $result=system("grep '^ *Host *github' ~/.ssh/config");
-    print "$result\n";
     if ($result!=0){
 	print "You need to add the following entry for github in .ssh/config\n\n\n";
         system("sed -e 's/\@\@ssh-keyname\@\@/${ssh_keyname}/g' $ssh_config_template");
@@ -79,6 +79,7 @@ if (not -e $ssh_config){
 # options
 my $help=0;
 my $info=0;
+my $setup_hubflow=0;
 my $owners=0;
 my $pull=0;
 
@@ -88,6 +89,7 @@ my $testopt=GetOptions(
            "info|i" => \$info,
            "owners|organisations|o" => \$owners,
            "pull" => \$pull,
+           "setup-hubflow" => \$setup_hubflow,
           );
 
 
@@ -107,6 +109,12 @@ Options
 
   -o  / --owners / --organisations
     show Organisations/Owners from whom repos will be fetched
+
+  --pull
+    clone/pull all packages
+
+  --setup-hubflow
+    installs hubflow (root password needed)
 
 ');
    print "\n";
@@ -155,6 +163,23 @@ if ($info==1){
     print "$repos Repos will be cloned/updated\n\n";
     exit;
 }
+
+# --pull
+if ($setup_hubflow==1){
+    my $hubflow_dir=$source_dir_abs."/gitflow";
+    if (-d $hubflow_dir){
+        # checkout the configured hubflow version
+        system("cd $hubflow_dir; git checkout $hubflow_version");
+        system("cd $hubflow_dir; sudo ./install.sh");
+        # checkout the develop tree to make pulls possible again
+        system("cd $hubflow_dir; git checkout develop");
+    } else {
+        print "\nYou have to use --pull before you can setup hubflow\n\n";
+   }
+    
+    exit;
+}
+
 
 
 
