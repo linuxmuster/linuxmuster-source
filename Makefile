@@ -31,6 +31,7 @@ install:
 	@install -d -m0755 -oroot -groot $(SHARE)
 	@install -d -m0755 -oroot -groot $(SHARE)/examples
 	@install -oroot -groot --mode=0644 config/example.linuxmuster-source.conf $(SHARE)/examples
+	@install -oroot -groot --mode=0644 config/ssh-config $(SHARE)/examples
 	@install -d -m0755 -oroot -groot $(GITHUB)/linuxmuster
 	@install -d -m0755 -oroot -groot $(GITHUB)/jeffbeck
 	@install -oroot -groot --mode=0644 repos/github/linuxmuster/*.list $(GITHUB)/linuxmuster
