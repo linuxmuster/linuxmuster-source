@@ -1,10 +1,5 @@
-# This entry is used by linuxmuster-source
-
-# github
-# uses @@@keyname@@@ key
-# github manual: ssh -T git@github.com
-# shows a Message: GitHub does not provide shell access.
+# This entry is used by linuxmuster-source for github
 Host github
    HostName github.com
    User git
-   IdentityFile ~/.ssh/@@@keyname@@@
+   IdentityFile ~/.ssh/@@ssh-keyname@@

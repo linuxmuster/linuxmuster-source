@@ -32,8 +32,17 @@ my $conf_dir=$home."/.linuxmuster-source";
 my $conf_file=$conf_dir."/linuxmuster-source.conf";
 my $conf_example_file="/usr/share/linuxmuster-source/examples/example.linuxmuster-source.conf";
 
+my $ssh_config_template="/usr/share/linuxmuster-source/examples/ssh-config";
+my $ssh_config=$home."/.ssh/config";
 
 system("mkdir -p $conf_dir");
+
+# default config
+my $ssh_keyname="";
+my $source_dir="linuxmuster-source";
+my $source_dir_abs = $home."/".$source_dir;
+my $repo_lists="/usr/share/linuxmuster-source/repos/github";
+
 
 if (not -e $conf_file){
     system("cp $conf_example_file $conf_file");
@@ -42,21 +51,30 @@ if (not -e $conf_file){
     exit;
 }
 
-# default config
-my $ssh_keyname="";
-my $source_dir="linuxmuster-source";
-my $source_dir_abs = $home."/".$source_dir;
-my $repo_lists="/usr/share/linuxmuster-source/repos/github";
 
 { package Conf ; do "$conf_file" 
   || die "Fehler: $conf_file could not be processed (syntax error?)\n";
   print "$conf_file processed succesfully\n"; 
 }
-
-
 # modify configuration
 $ssh_keyname=$Conf::ssh_keyname;
 print "Key: $Conf::ssh_keyname configured\n";
+
+
+if (not -e $ssh_config){
+    print "Using ssh keyname $ssh_keyname to create .ssh/config \n";
+    system("sed -e 's/\@\@ssh-keyname\@\@/${ssh_keyname}/g' $ssh_config_template > $ssh_config"); 
+    exit;
+} else {
+    my $result=system("grep '^ *Host *github' ~/.ssh/config");
+    print "$result\n";
+    if ($result!=0){
+	print "You need to add the following entry for github in .ssh/config\n\n\n";
+        system("sed -e 's/\@\@ssh-keyname\@\@/${ssh_keyname}/g' $ssh_config_template");
+        print "\nPlease add it manually\n\n"; 
+    exit;
+    }
+}
 
 # options
 my $help=0;
