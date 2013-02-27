@@ -36,6 +36,10 @@ install:
 	@install -oroot -groot --mode=0644 repos/github/linuxmuster/*.list $(GITHUB)/linuxmuster
 	@install -d -m0755 -oroot -groot $(GITHUB)/jeffbeck
 	@install -oroot -groot --mode=0644 repos/github/jeffbeck/*.list $(GITHUB)/jeffbeck
+	@install -d -m0755 -oroot -groot $(GITHUB)/ironiemix
+	@install -oroot -groot --mode=0644 repos/github/ironiemix/*.list $(GITHUB)/ironiemix
+	@install -d -m0755 -oroot -groot $(GITHUB)/fschuett
+	@install -oroot -groot --mode=0644 repos/github/fschuett/*.list $(GITHUB)/fschuett
 	@install -d -m0755 -oroot -groot $(GITHUB)/datasift
 	@install -oroot -groot --mode=0644 repos/github/datasift/*.list $(GITHUB)/datasift
 

@@ -26,6 +26,8 @@ use English;
 # add option --cron to pull daily
 # add option to go to github on the project's page 
 # (fork it on github and pull the fork???)
+#
+# Lists: ignore empty lines, allow comments
 # 
 my $home = $ENV{'HOME'};
 my $conf_dir=$home."/.linuxmuster-source";
