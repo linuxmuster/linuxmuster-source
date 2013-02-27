@@ -192,7 +192,7 @@ if ($setup_hubflow==1){
         # checkout the develop tree to make pulls possible again
         system("cd $hubflow_dir; git checkout develop");
     } else {
-        print "\nYou have to use --pull before you can setup hubflow\n\n";
+        print "\nYou have to use --pull-repo gitflow  before you can setup hubflow\n\n";
    }
     
     exit;
