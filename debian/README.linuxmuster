@@ -5,3 +5,23 @@ Packaging:
 1. Go to the top directory of the Repo, where the Makefile is.
 2. make deb
 
+
+
+############################################################
+Updating lists of repos
+############################################################
+
+1. Lists are in repos/github/$GITHUBUSER
+2. File names:
+   - All lists must end with .list
+   - The part before a .list is the RANGE
+   - A Range can be every string. Recommended are:
+     core (Central parts of linuxmuster.net)
+     test (Test stuff to learn to work with git)
+     additions (Parts from other contributors)
+3. Syntax of the lists (Examples):
+   A simple repo:
+        repo-name-on-github
+   A repo thatvis manahge with hubflow
+        repo-name-on-github::hubflow
+  
