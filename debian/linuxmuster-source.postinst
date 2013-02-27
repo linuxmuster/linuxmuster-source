@@ -25,23 +25,28 @@ set -e
 
 case "$1" in
     configure)
-    cd /tmp; git clone https://github.com/datasift/gitflow.git
-    cd /tmp/gitflow; ./install.sh
+    # if [ -e /tmp/gitflow ]; then
+    # 	rm -rf /tmp/gitflow
+    # fi
+    # cd /tmp; git clone https://github.com/datasift/gitflow.git
+    # cd /tmp/gitflow; ./install.sh
     ;;
 
     install)
-    cd /tmp; git clone https://github.com/datasift/gitflow.git
-    cd /tmp/gitflow; ./install.sh
-
-
+    # if [ -e /tmp/gitflow ]; then
+    # 	rm -rf /tmp/gitflow
+    # fi
+    # cd /tmp; git clone https://github.com/datasift/gitflow.git
+    # cd /tmp/gitflow; ./install.sh
     ;;
-
 
     upgrade)
-    cd /tmp; git clone https://github.com/datasift/gitflow.git
-    cd /tmp/gitflow; ./install.sh
+    # if [ -e /tmp/gitflow ]; then
+    # 	rm -rf /tmp/gitflow
+    # fi
+    # cd /tmp; git clone https://github.com/datasift/gitflow.git
+    # cd /tmp/gitflow; ./install.sh
     ;;
-
 
     abort-upgrade|abort-remove|abort-deconfigure)
 

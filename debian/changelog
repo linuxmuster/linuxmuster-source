@@ -1,4 +1,16 @@
-linuxmuster-source (0.2.0-1ubuntu1) precise; urgency=low
+linuxmuster-source (0.3.0-3) precise; urgency=low
+
+  * Postinstall script removed
+
+ -- Ruediger Beck <bz@c0144p01.bszleo.de>  Wed, 27 Feb 2013 19:26:59 +0100
+
+linuxmuster-source (0.3.0-2) precise; urgency=low
+
+  * Postinstall script changed
+
+ -- Ruediger Beck <bz@c0144p01.bszleo.de>  Wed, 27 Feb 2013 19:15:12 +0100
+
+linuxmuster-source (0.3.0-1) precise; urgency=low
 
   * New upstream Release 
 
