@@ -1,3 +1,9 @@
+linuxmuster-source (0.1.0-1) precise; urgency=low
+
+  * Configuration should work now
+
+ -- bz <bz@adler>  Sun, 24 Feb 2013 02:42:18 +0100
+
 linuxmuster-source (0.0.1-1) precise; urgency=low
 
   * First Revision

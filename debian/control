@@ -10,6 +10,6 @@ Package: linuxmuster-source
 Architecture: all
 Suggests: 
 Pre-Depends: 
-Depends: 
+Depends: git 
 Description: managing linuxmuster.net sourcecode on github
  lets you clone/pull the source and verify/test it

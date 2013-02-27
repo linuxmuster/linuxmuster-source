@@ -15,14 +15,14 @@ use English;
 #
 # configure git (colors name, email, ...) 
 #
-# include and install hubflow?
-#
 # add option --check 
 #    to verify if debian/README.linuxmuster is there
 #    check more things
 # add option --buildpackage name
 #    to build a package
 # add option --build-all-packages
+# add option --pull-clone reponame 
+#     (pulled auf github geclontes repo nach ~/linuxmuster-source-clones-$GITHUBUSER)
 # add option --cron to pull daily
 # add option to go to github on the project's page 
 # (fork it on github and pull the fork???)
@@ -55,11 +55,11 @@ if (not -e $conf_file){
 
 { package Conf ; do "$conf_file" 
   || die "Fehler: $conf_file could not be processed (syntax error?)\n";
-  print "$conf_file processed succesfully\n"; 
+  #print "$conf_file processed succesfully\n"; 
 }
 # modify configuration
 $ssh_keyname=$Conf::ssh_keyname;
-print "Key: $Conf::ssh_keyname configured\n";
+print "Using key: $Conf::ssh_keyname\n";
 
 
 if (not -e $ssh_config){
@@ -67,7 +67,7 @@ if (not -e $ssh_config){
     system("sed -e 's/\@\@ssh-keyname\@\@/${ssh_keyname}/g' $ssh_config_template > $ssh_config"); 
     exit;
 } else {
-    my $result=system("grep '^ *Host *github' ~/.ssh/config");
+    my $result=system("grep '^ *Host *github' ~/.ssh/config > /dev/null");
     if ($result!=0){
 	print "You need to add the following entry for github in .ssh/config\n\n\n";
         system("sed -e 's/\@\@ssh-keyname\@\@/${ssh_keyname}/g' $ssh_config_template");
@@ -82,6 +82,7 @@ my $info=0;
 my $setup_hubflow=0;
 my $owners=0;
 my $pull=0;
+my $pull_repo="";
 
 # Parsen der Optionen
 my $testopt=GetOptions(
@@ -89,6 +90,7 @@ my $testopt=GetOptions(
            "info|i" => \$info,
            "owners|organisations|o" => \$owners,
            "pull" => \$pull,
+           "pull-repo=s" => \$pull_repo,
            "setup-hubflow" => \$setup_hubflow,
           );
 
@@ -99,7 +101,12 @@ my $testopt=GetOptions(
 
 if ($help==1){
        print('
-Options
+
+The Manual for linuxmuster-source is here:
+
+    http://www.linuxmuster.net/entwicklung:meta:github
+
+Options:
 
   -h  / --help
 
@@ -112,6 +119,9 @@ Options
 
   --pull
     clone/pull all packages
+
+  --pull-repo reponame
+    clone/pull the repo reponame
 
   --setup-hubflow
     installs hubflow (root password needed)
@@ -154,8 +164,14 @@ if ($info==1){
     foreach my $owner (@owners){
         print "Owner/Organisation: $owner\n";
         my @repos = &fetch_repos($owner);
-        foreach my $repo (@repos){
-            print "  * $repo\n";
+        foreach my $repo_string (@repos){
+            #print "-->  $repo_string\n";
+            my ($range,$repo,$option) = &analyze_repo_string($repo_string);
+            my $option_string="";
+            if ($option ne ""){
+                $option_string="($option)";
+            }
+            print "  * $range -> $repo $option_string\n";
             $repos++;
         }
     }
@@ -183,8 +199,8 @@ if ($setup_hubflow==1){
 
 
 
-# --pull
-if ($pull==1){
+# --pull | --pull-repo reponame
+if ($pull==1 or $pull_repo ne ""){
     my $repo_counter=0;
     my @owners = &fetch_owners();
     # make sure that the ssh key is loaded
@@ -192,6 +208,8 @@ if ($pull==1){
     system("mkdir -p $source_dir_abs");
     foreach my $owner (@owners){
         my @repos = &fetch_repos($owner);
+
+
 
         # make sure the following line exists in .ssh/config
         # ????? call it linuxmuster-source ?????
@@ -203,23 +221,56 @@ if ($pull==1){
 
         print "\n";
         foreach my $repo (@repos){
-            my ($range,$repo_name)=split(/::/,$repo);
+
+            my ($range,$repo_name,$option)=split(/::/,$repo);
+            if (not defined $option){
+                $option="";
+            }
+            #print "$repo_name   $option\n";
+
+            if ($pull_repo ne "" and $pull_repo ne $repo_name){
+                print "-) ${range}::${repo_name} ignored\n";
+                next;
+            }
+
             # do it
             $repo_counter++;
 	    print "${repo_counter}) PULLING/CLONING $repo\n";
 	    print "   owner/organisation: $owner\n";
-            my $clone_command="cd $source_dir_abs; ".
-                              "git clone github:${owner}/${repo_name}.git";
-            my $pull_command="cd ${source_dir_abs}/${repo_name}; ".
-                             "git pull";
-            #print "$clone_command\n";
-            #print "$pull_command\n";
+
+            # commands
+            my $git_clone_command="cd $source_dir_abs; ".
+                         "git clone github:${owner}/${repo_name}.git";
+            my $git_pull_command="cd ${source_dir_abs}/${repo_name}; ".
+                         "git pull";
+            my $hubflow_init_command="cd ${source_dir_abs}/${repo_name}; ".
+                         "git hf init";
+            my $hubflow_update_command="cd ${source_dir_abs}/${repo_name}; ".
+                         "git hf update";
+
+            #print "$git_clone_command\n";
+            #print "$git_pull_command\n";
             if (-d "${source_dir_abs}/${repo_name}"){
-                print "   Pulling $repo_name ...\n";
-                system($pull_command);
+                if ($option eq "hubflow"){
+                    # its there -> update
+                    print "#####   git hf update $repo_name ... #####\n";
+                    system($hubflow_update_command);
+                } else {
+                    # its there -> pull
+                    print "#####   git pull  $repo_name ... #####\n";
+                    system($git_pull_command);
+                }
             } else {
-                print "   Cloning $repo_name ...\n";
-                system($clone_command);
+                # nothing there -> clone
+                print "#####   git clone $repo_name ... #####\n";
+                system($git_clone_command);
+                if ($option eq "hubflow"){
+                    # do hubflow stuff
+                    print "#####   git hf init  $repo_name ... #####\n";
+                    system($hubflow_init_command);
+                    print "#####   git hf update $repo_name ... #####\n";
+                    system($hubflow_update_command);
+                }
             }
             print "----- DONE -------------------------------------------------\n\n";
         }
@@ -271,6 +322,14 @@ sub fetch_repos {
 }
 
 
+sub analyze_repo_string {
+    my ($string) = @_;
+    my ($range,$repo,$option) = split(/::/,$string);
+    if (not defined $option){
+        $option="";
+    }
+    return $range,$repo,$option;
+}
 
 sub  check_options{
    my ($parse_ergebnis) = @_;
