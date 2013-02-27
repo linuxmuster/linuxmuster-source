@@ -1,3 +1,9 @@
+linuxmuster-source (0.2.0-1) precise; urgency=low
+
+  * New upsteam release, with all lists
+
+ -- bz <bz@adler>  Wed, 27 Feb 2013 03:03:23 +0100
+
 linuxmuster-source (0.1.0-1) precise; urgency=low
 
   * Configuration should work now
