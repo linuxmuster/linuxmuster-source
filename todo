@@ -1,0 +1,2 @@
+* Add option to check debian/compat
+   - Must be Version 5 for Trusty
