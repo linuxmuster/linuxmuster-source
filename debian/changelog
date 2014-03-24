@@ -1,3 +1,9 @@
+linuxmuster-source (0.5.0-1) trusty-unstable; urgency=low
+
+  * Updated package lists
+
+ -- bz <bz@overpower>  Mon, 24 Mar 2014 22:03:34 +0100
+
 linuxmuster-source (0.4.0-2) trusty-unstable; urgency=low
 
   * Build Package for Trusty
