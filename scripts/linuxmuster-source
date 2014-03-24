@@ -84,7 +84,7 @@ my $info=0;
 my $setup_hubflow=0;
 my $owners=0;
 my $pull=0;
-my $cert_key="";
+my $ssh_config_entry="";
 my $pull_repo="";
 
 # Parsen der Optionen
@@ -94,7 +94,7 @@ my $testopt=GetOptions(
            "owners|organisations|o" => \$owners,
            "pull" => \$pull,
            "pull-repo=s" => \$pull_repo,
-           "cert-key=s" => \$cert_key,
+           "cert=s" => \$ssh_config_entry,
            "setup-hubflow" => \$setup_hubflow,
           );
 
@@ -130,9 +130,13 @@ Options:
   --setup-hubflow
     installs hubflow (root password needed)
 
-  --cert-key key
-    pull repo for certification with the ssh key key
-
+  --cert ssh-config-entry
+    pull repo linuxmuster-cert (for certification, not public)
+    Add this entry to .ssh/config:
+      Host ssh-config-entry
+        HostName cvs.bszleo.de
+        User gitolite
+        IdentityFile ~/.ssh/your_key
 ');
    print "\n";
        exit;
@@ -287,12 +291,22 @@ if ($pull==1 or $pull_repo ne ""){
 }
 
 
-# --cert key
-if ($cert ne ""){
+# --cert ssh-config-entry
+if ($ssh_config_entry ne ""){
     my $git_clone_command="cd $source_dir_abs; ".
-             "git clone ${cert_key}:linuxmuster-cert.git";
-    my $git_pull_command="cd ${source_dir_abs}/${repo_name}; ".
+             "git clone ${ssh_config_entry}:linuxmuster-cert.git";
+    my $git_pull_command="cd ${source_dir_abs}/linuxmuster-cert; ".
             "git pull";
+    if (-d "${source_dir_abs}/linuxmuster-cert"){
+        # its there -> pull
+        print "#####   git pull  linuxmuster-cert  ... #####\n";
+        system($git_pull_command);
+    } else {
+        # nothing there -> clone
+        print "#####   git clone  linuxmuster-cert  ... #####\n";
+        system($git_clone_command);
+    }
+    print "----- DONE -------------------------------------------------\n\n";
 
 }
 

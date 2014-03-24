@@ -1,3 +1,9 @@
+linuxmuster-source (0.7.0-5) trusty-unstable; urgency=low
+
+  * Option --cert-key added
+
+ -- bz <bz@overpower>  Mon, 24 Mar 2014 22:45:29 +0100
+
 linuxmuster-source (0.6.0-1) trusty-unstable; urgency=low
 
   * Updated package lists
