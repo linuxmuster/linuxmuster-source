@@ -84,6 +84,7 @@ my $info=0;
 my $setup_hubflow=0;
 my $owners=0;
 my $pull=0;
+my $cert_key="";
 my $pull_repo="";
 
 # Parsen der Optionen
@@ -93,6 +94,7 @@ my $testopt=GetOptions(
            "owners|organisations|o" => \$owners,
            "pull" => \$pull,
            "pull-repo=s" => \$pull_repo,
+           "cert-key=s" => \$cert_key,
            "setup-hubflow" => \$setup_hubflow,
           );
 
@@ -127,6 +129,9 @@ Options:
 
   --setup-hubflow
     installs hubflow (root password needed)
+
+  --cert-key key
+    pull repo for certification with the ssh key key
 
 ');
    print "\n";
@@ -279,6 +284,16 @@ if ($pull==1 or $pull_repo ne ""){
     }
     #print "------------------------------------------------------------\n";
     print "Cloned/Pulled $repo_counter repositories\n";
+}
+
+
+# --cert key
+if ($cert ne ""){
+    my $git_clone_command="cd $source_dir_abs; ".
+             "git clone ${cert_key}:linuxmuster-cert.git";
+    my $git_pull_command="cd ${source_dir_abs}/${repo_name}; ".
+            "git pull";
+
 }
 
 ############################################################
