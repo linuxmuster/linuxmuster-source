@@ -1,3 +1,9 @@
+linuxmuster-source (0.4.0-2) trusty-unstable; urgency=low
+
+  * Build Package for Trusty
+
+ -- bz <bz@overpower>  Mon, 24 Mar 2014 21:00:23 +0100
+
 linuxmuster-source (0.4.0-1) precise; urgency=low
 
   * New script lms update 
