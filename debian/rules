@@ -74,7 +74,7 @@ binary-indep: build install
 # Install manpages for linuxmuster-source
 #	dh_installman -plinuxmuster-source man/de/linuxmuster-source.de.1
 #	dh_undocumented
-	dh_install --sourcedir=debian/linuxmuster-source
+#	dh_install --sourcedir=debian/linuxmuster-source
 	dh_link
 #	dh_strip
 	dh_compress
