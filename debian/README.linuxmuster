@@ -12,16 +12,18 @@ Updating lists of repos
 ############################################################
 
 1. Lists are in repos/github/$GITHUBUSER
-2. File names:
+2. Query for existing names with:  ./is-in-source
+3. File names:
    - All lists must end with .list
    - The part before a .list is the RANGE
    - A Range can be every string. Recommended are:
      core (Central parts of linuxmuster.net)
      test (Test stuff to learn to work with git)
      additions (Parts from other contributors)
-3. Syntax of the lists (Examples):
+     tools (Collection of scripts/programs)
+4. Syntax of the lists (Examples):
    A simple repo:
         repo-name-on-github
-   A repo thatvis manahge with hubflow
+   A repo that is managed with hubflow
         repo-name-on-github::hubflow
   
