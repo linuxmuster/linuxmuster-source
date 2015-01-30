@@ -1,2 +1,2 @@
 #!/bin/bash
-grep $1 -r ./repos
+grep "$1" -r ./repos
